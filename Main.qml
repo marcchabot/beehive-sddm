@@ -437,12 +437,26 @@ Item {
                 }
             }
 
-            // ── Sélecteur de session ────────────────────────────────────
+            // ── Sélecteur de session ──────────────────────────────
+            // sessionModel.get(i) retourne un objet JS {name, file, exec, ...}
+            // C'est la méthode native QAbstractListModel en QML — pas de delegate nécessaire
             Item {
                 id: sessionPickerRow
                 width: parent.width
                 height: 28
-                property int sessionIdx: sessionListView.currentIndex
+                property int sessionIdx: 0
+
+                function getSessionName(idx) {
+                    if (typeof sessionModel === "undefined") return "Hyprland"
+                    var row = sessionModel.get(idx)
+                    if (row && row.name) return row.name
+                    return "Hyprland"
+                }
+
+                Component.onCompleted: {
+                    sessionIdx = (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
+                    sessionDisplayText.text = getSessionName(sessionIdx)
+                }
 
                 Text {
                     id: sessionLabel
@@ -493,34 +507,13 @@ Item {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            var count = sessionListView.count
+                            if (typeof sessionModel === "undefined") return
+                            var count = sessionModel.rowCount()
                             if (count > 1) {
-                                sessionListView.currentIndex = (sessionListView.currentIndex + 1) % count
-                                sessionDisplayText.text = sessionListView.currentItem.sName
+                                sessionPickerRow.sessionIdx = (sessionPickerRow.sessionIdx + 1) % count
+                                sessionDisplayText.text = sessionPickerRow.getSessionName(sessionPickerRow.sessionIdx)
                             }
                         }
-                    }
-                }
-
-                // ListView 1px pour instancier les delegates et lire model.name
-                ListView {
-                    id: sessionListView
-                    model: sessionModel
-                    currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
-                    width: 1; height: 1; opacity: 0; clip: true
-                    delegate: Item { width: 1; height: 1; property string sName: model.name }
-                }
-
-                // Timer : attend que la ListView instancie ses delegates
-                Timer {
-                    interval: 100
-                    running: true
-                    repeat: false
-                    onTriggered: {
-                        if (sessionListView.currentItem)
-                            sessionDisplayText.text = sessionListView.currentItem.sName
-                        else
-                            sessionDisplayText.text = sessionModel.rowCount() > 0 ? "Hyprland" : "—"
                     }
                 }
             }
