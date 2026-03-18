@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
 import QtMultimedia 5.15
+import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Bee-Hive SDDM — Thème de connexion v0.1.6 (Compact Layout & Clock Fix)
@@ -434,88 +435,38 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.doLogin()
-                }
-            }
-
-            // ── Sélecteur de session ──────────────────────────────
-            // sessionModel.get(i) retourne un objet JS {name, file, exec, ...}
-            // C'est la méthode native QAbstractListModel en QML — pas de delegate nécessaire
-            Item {
+                   // ── Sélecteur de session (SddmComponents ComboBox natif) ────
+            Row {
                 id: sessionPickerRow
                 width: parent.width
-                height: 28
-                property int sessionIdx: 0
-
-                function getSessionName(idx) {
-                    if (typeof sessionModel === "undefined") return "Hyprland"
-                    var row = sessionModel.get(idx)
-                    if (row && row.name) return row.name
-                    return "Hyprland"
-                }
-
-                Component.onCompleted: {
-                    sessionIdx = (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
-                    sessionDisplayText.text = getSessionName(sessionIdx)
-                }
+                spacing: 8
+                property int sessionIdx: sessionComboNative.index
 
                 Text {
-                    id: sessionLabel
                     text: "Session :"
                     color: root.textPrimary
                     font { pixelSize: 11; family: "monospace" }
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
                 }
 
-                Rectangle {
-                    anchors {
-                        left: sessionLabel.right
-                        leftMargin: 8
-                        right: parent.right
-                        verticalCenter: parent.verticalCenter
-                    }
+                ComboBox {
+                    id: sessionComboNative
+                    width: parent.width - 80
                     height: 28
-                    radius: 6
-                    color: Qt.rgba(0, 0, 0, 0.4)
-                    border.color: root.glassBorder
-                    border.width: 1
-
-                    Text {
-                        id: sessionDisplayText
-                        anchors {
-                            left: parent.left
-                            right: arrowIndicator.left
-                            leftMargin: 10
-                            rightMargin: 4
-                            verticalCenter: parent.verticalCenter
-                        }
-                        text: "—"
-                        color: root.textPrimary
-                        font { pixelSize: 12; family: "monospace" }
-                        elide: Text.ElideRight
-                    }
-
-                    Text {
-                        id: arrowIndicator
-                        anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
-                        text: "▾"
-                        color: root.accent
-                        font.pixelSize: 12
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (typeof sessionModel === "undefined") return
-                            var count = sessionModel.rowCount()
-                            if (count > 1) {
-                                sessionPickerRow.sessionIdx = (sessionPickerRow.sessionIdx + 1) % count
-                                sessionDisplayText.text = sessionPickerRow.getSessionName(sessionPickerRow.sessionIdx)
-                            }
-                        }
-                    }
+                    model: sessionModel
+                    index: sessionModel.lastIndex
+                    font.pixelSize: 12
+                    font.family: "monospace"
+                    color: root.textPrimary
+                    arrowColor: root.accent
+                    hoverColor: Qt.rgba(1, 0.72, 0.11, 0.15)
+                    focusColor: Qt.rgba(1, 0.72, 0.11, 0.25)
+                    borderColor: root.glassBorder
+                    menuColor: Qt.rgba(0.07, 0.07, 0.08, 0.97)
                 }
+            }
+
+         }
             }
 
             Row {
