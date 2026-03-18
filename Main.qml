@@ -388,20 +388,6 @@ Item {
                     model: sessionModel
                     textRole: "name"
                     currentIndex: sessionModel.lastIndex
-
-                    background: Rectangle {
-                        radius: 7
-                        color: Qt.rgba(0, 0, 0, 0.38)
-                        border.color: root.glassBorder
-                        border.width: 1
-                    }
-                    contentItem: Text {
-                        leftPadding: 10
-                        text: sessionCombo.displayText
-                        color: root.textMuted
-                        font { pixelSize: 11; family: "monospace" }
-                        verticalAlignment: Text.AlignVCenter
-                    }
                 }
             }
 
