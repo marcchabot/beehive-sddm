@@ -437,89 +437,101 @@ Item {
                 }
             }
 
-            // ── Sélecteur de session ─────────────────────────────────────────────
-            // ComboBox natif Qt Quick Controls 2 avec textRole "name"
-            // C'est la seule méthode fiable sans import SddmComponents
-            Row {
+            // ── Sélecteur de session ────────────────────────────────────
+            // Approche directe : Item avec property int sessionIdx
+            // + ListView visible (1px) pour que les delegates soient instanciés
+            // et exposent model.name via un alias de propriété.
+            Item {
                 id: sessionPickerRow
                 width: parent.width
-                spacing: 8
-                property int sessionIdx: sessionCombo.currentIndex
+                height: 28
+                property int sessionIdx: sessionListView.currentIndex
 
+                // Label
                 Text {
+                    id: sessionLabel
                     text: "Session :"
                     color: root.textPrimary
                     font { pixelSize: 11; family: "monospace" }
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
                 }
 
-                ComboBox {
-                    id: sessionCombo
-                    width: parent.width - 80
-                    height: 28
-                    model: sessionModel
-                    textRole: "name"
-                    currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
-
-                    // Style personnalisé Bee-Hive
-                    background: Rectangle {
-                        radius: 6
-                        color: Qt.rgba(0, 0, 0, 0.4)
-                        border.color: root.glassBorder
-                        border.width: 1
+                // Boîte visible
+                Rectangle {
+                    id: sessionBox
+                    anchors {
+                        left: sessionLabel.right
+                        leftMargin: 8
+                        right: parent.right
+                        verticalCenter: parent.verticalCenter
                     }
+                    height: 28
+                    radius: 6
+                    color: Qt.rgba(0, 0, 0, 0.4)
+                    border.color: root.glassBorder
+                    border.width: 1
 
-                    contentItem: Text {
-                        leftPadding: 10
-                        rightPadding: 10
-                        text: sessionCombo.displayText
+                    // Texte affiché
+                    Text {
+                        id: sessionDisplayText
+                        anchors {
+                            left: parent.left
+                            right: arrowIndicator.left
+                            leftMargin: 10
+                            rightMargin: 4
+                            verticalCenter: parent.verticalCenter
+                        }
+                        text: "Chargement..."
                         color: root.textPrimary
                         font { pixelSize: 12; family: "monospace" }
-                        verticalAlignment: Text.AlignVCenter
                         elide: Text.ElideRight
                     }
 
-                    indicator: Text {
-                        x: sessionCombo.width - width - 8
-                        y: (sessionCombo.height - height) / 2
+                    Text {
+                        id: arrowIndicator
+                        anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
                         text: "▾"
                         color: root.accent
                         font.pixelSize: 12
                     }
 
-                    // Popup stylizé
-                    popup: Popup {
-                        y: sessionCombo.height
-                        width: sessionCombo.width
-                        implicitHeight: Math.min(contentItem.implicitHeight, 200)
-                        padding: 1
-
-                        background: Rectangle {
-                            color: Qt.rgba(0.07, 0.07, 0.08, 0.97)
-                            border.color: root.glassBorder
-                            radius: 6
-                        }
-
-                        contentItem: ListView {
-                            clip: true
-                            implicitHeight: contentHeight
-                            model: sessionCombo.popup.visible ? sessionCombo.delegateModel : null
-                            ScrollIndicator.vertical: ScrollIndicator {}
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            var count = sessionListView.count
+                            if (count > 1)
+                                sessionListView.currentIndex = (sessionListView.currentIndex + 1) % count
                         }
                     }
+                }
 
-                    delegate: ItemDelegate {
-                        width: sessionCombo.width
-                        contentItem: Text {
-                            text: model.name
-                            color: index === sessionCombo.currentIndex ? root.accent : root.textPrimary
-                            font { pixelSize: 12; family: "monospace" }
-                            verticalAlignment: Text.AlignVCenter
-                            leftPadding: 10
-                        }
-                        background: Rectangle {
-                            color: hovered ? Qt.rgba(1, 0.72, 0.11, 0.12) : "transparent"
-                        }
+                // ListView opaque de 1px — SEULEMENT pour instancier les delegates
+                // et pouvoir lire model.name de façon réactive
+                ListView {
+                    id: sessionListView
+                    model: sessionModel
+                    currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
+                    width: 1
+                    height: 1
+                    opacity: 0
+                    clip: true
+
+                    delegate: Item {
+                        width: 1
+                        height: 1
+                        property string sName: model.name
+                    }
+
+                    // Dès que le currentItem est prêt, on met à jour le texte affiché
+                    onCurrentItemChanged: {
+                        if (currentItem && currentItem.sName)
+                            sessionDisplayText.text = currentItem.sName
+                    }
+                    Component.onCompleted: {
+                        if (currentItem && currentItem.sName)
+                            sessionDisplayText.text = currentItem.sName
                     }
                 }
             }
