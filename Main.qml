@@ -513,7 +513,9 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                font.pixelSize: 16
+                                color: root.accent
+                                font.pixelSize: 18
+                                font.bold: true
                             }
                             MouseArea {
                                 id: sysMouse
@@ -612,10 +614,6 @@ Item {
         root.isLogging  = true
         if (typeof sddm !== "undefined") {
             sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
-        }
-    }
-}
-   sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
         }
     }
 }
