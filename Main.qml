@@ -4,7 +4,7 @@ import QtGraphicalEffects 1.15
 import QtMultimedia 5.15
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.1.5 (Standardisation Syntaxe)
+// Bee-Hive SDDM — Thème de connexion v0.1.6 (Compact Layout & Clock Fix)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -173,13 +173,60 @@ Item {
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // RESEARCH: "Breathing / Wind" effect on a static PNG background
+    // ══════════════════════════════════════════════════════════════════════
+    //
+    // OPTION A — Scale-pulse (already in use, tweak for more life):
+    //   SequentialAnimation on scale {
+    //       NumberAnimation { to: 1.06; duration: 9000; easing.type: Easing.InOutSine }
+    //       NumberAnimation { to: 1.00; duration: 9000; easing.type: Easing.InOutSine }
+    //   }
+    //   Combine with a very slow x/y Translate nudge (±8 px) on a different
+    //   period (13 s) for an organic parallax feel.
+    //
+    // OPTION B — ShaderEffect ripple (QML built-in, no C++):
+    //   Replace the AnimatedImage with a ShaderEffect that samples the image
+    //   as a texture and applies a sine-wave UV distortion:
+    //
+    //   ShaderEffect {
+    //       property variant src: bgTexture    // ShaderEffectSource wrapping the Image
+    //       property real    t:   0.0
+    //       NumberAnimation on t { from: 0; to: 6.2832; duration: 12000; loops: -1 }
+    //       fragmentShader: "
+    //           uniform sampler2D src;
+    //           uniform float     t;
+    //           varying vec2      qt_TexCoord0;
+    //           void main() {
+    //               vec2 uv = qt_TexCoord0;
+    //               uv.x += sin(uv.y * 4.0 + t) * 0.004;  // horizontal ripple
+    //               uv.y += cos(uv.x * 3.5 + t) * 0.003;  // vertical ripple
+    //               gl_FragColor = texture2D(src, uv);
+    //           }
+    //       "
+    //   }
+    //   Amplitude 0.003–0.006 gives a subtle "heat shimmer / silk cloth" look.
+    //   Increase the amplitude and frequency for a stronger wind effect.
+    //
+    // OPTION C — OpacityAnimator on a duplicate blurred layer (zero-cost):
+    //   Stack two copies of the background (one slightly blurred, one sharp).
+    //   Animate the blurred copy's opacity 0.0 ↔ 0.25 over 8 s.
+    //   The slow cross-fade mimics atmospheric depth / bokeh breathing.
+    //
+    // OPTION D — sddm-silent style (video loop):
+    //   Use background_type=video with a seamless MP4 encode of the PNG
+    //   processed through ffmpeg with a subtle zoom/pan filter:
+    //   ffmpeg -loop 1 -i bg.png -vf "zoompan=z='1+0.05*sin(2*PI*t/20)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1920x1080,fps=30" -t 20 bg_wind.mp4
+    //
+    // ══════════════════════════════════════════════════════════════════════
+
     Rectangle {
         id: loginPanel
-        width: 360
-        height: loginContent.implicitHeight + 60
+        width: 310
+        height: loginContent.implicitHeight + 46
         anchors {
             left: parent.left
-            leftMargin: 80
+            leftMargin: 60
             verticalCenter: parent.verticalCenter
         }
         radius: 22
@@ -221,13 +268,13 @@ Item {
             id: loginContent
             anchors {
                 top: parent.top
-                topMargin: 36
+                topMargin: 24
                 left: parent.left
-                leftMargin: 36
+                leftMargin: 24
                 right: parent.right
-                rightMargin: 36
+                rightMargin: 24
             }
-            spacing: 18
+            spacing: 14
 
             Column {
                 width: parent.width
@@ -235,7 +282,7 @@ Item {
                 Text {
                     id: beeLogo
                     text: "🐝"
-                    font.pixelSize: 44
+                    font.pixelSize: 34
                     anchors.horizontalCenter: parent.horizontalCenter
                     SequentialAnimation on scale {
                         loops: Animation.Infinite
@@ -248,7 +295,7 @@ Item {
                     color: root.accent
                     font {
                         bold: true
-                        pixelSize: 27
+                        pixelSize: 22
                         family: "monospace"
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -257,7 +304,7 @@ Item {
                     text: (typeof sddm !== "undefined") ? sddm.hostName : "Bee-Hive"
                     color: root.textMuted
                     font {
-                        pixelSize: 12
+                        pixelSize: 11
                         family: "monospace"
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -284,18 +331,19 @@ Item {
                 }
                 Rectangle {
                     width: parent.width
-                    height: 42
-                    radius: 9
+                    height: 38
+                    radius: 8
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: userField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
                     TextInput {
                         id: userField
+                        // topMargin intentionally omitted — verticalAlignment handles centering.
+                        // Adding topMargin without a matching bottomMargin shifts the baseline low.
                         anchors {
                             fill: parent
-                            leftMargin: 14
-                            rightMargin: 14
-                            topMargin: 12
+                            leftMargin: 12
+                            rightMargin: 12
                         }
                         color: root.textPrimary
                         font {
@@ -324,8 +372,8 @@ Item {
                 }
                 Rectangle {
                     width: parent.width
-                    height: 42
-                    radius: 9
+                    height: 38
+                    radius: 8
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: passwordField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
@@ -333,8 +381,8 @@ Item {
                         id: passwordField
                         anchors {
                             fill: parent
-                            leftMargin: 14
-                            rightMargin: 14
+                            leftMargin: 12
+                            rightMargin: 12
                         }
                         color: root.textPrimary
                         font {
@@ -366,8 +414,8 @@ Item {
             Rectangle {
                 id: loginButton
                 width: parent.width
-                height: 46
-                radius: 11
+                height: 40
+                radius: 9
                 color: loginMouse.pressed ? Qt.darker(root.accent, 1.35) : (loginMouse.containsMouse ? Qt.lighter(root.accent, 1.1) : root.accent)
                 Text {
                     anchors.centerIn: parent
@@ -455,9 +503,9 @@ Item {
                     delegate: Column {
                         spacing: 5
                         Rectangle {
-                            width: 46
-                            height: 46
-                            radius: 11
+                            width: 40
+                            height: 40
+                            radius: 9
                             color: sysMouse.pressed ? Qt.rgba(1, 0.72, 0.11, 0.28) : (sysMouse.containsMouse ? Qt.rgba(1, 0.72, 0.11, 0.14) : Qt.rgba(0,0,0,0.32))
                             border.color: sysMouse.containsMouse ? root.glassBorder : "transparent"
                             border.width: 1
@@ -465,7 +513,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                font.pixelSize: 18
+                                font.pixelSize: 16
                             }
                             MouseArea {
                                 id: sysMouse
@@ -496,12 +544,13 @@ Item {
         }
     }
 
+    // ── Clock — bottom-right to avoid overlap with left-aligned login panel ──
     Column {
         anchors {
             bottom: parent.bottom
             bottomMargin: 44
-            left: parent.left
-            leftMargin: 80
+            right: parent.right
+            rightMargin: 60
         }
         spacing: 4
         Text {
@@ -513,6 +562,7 @@ Item {
                 family: "monospace"
             }
             opacity: 0.92
+            anchors.right: parent.right
         }
         Text {
             id: dateText
@@ -523,6 +573,7 @@ Item {
                 letterSpacing: 2
             }
             opacity: 0.85
+            anchors.right: parent.right
         }
         Timer {
             interval: 1000
@@ -546,7 +597,7 @@ Item {
             right: parent.right
             rightMargin: 30
         }
-        text: "Bee-Hive SDDM v0.1.5 🍯"
+        text: "Bee-Hive SDDM v0.1.6 🍯"
         color: root.textMuted
         font {
             pixelSize: 11
