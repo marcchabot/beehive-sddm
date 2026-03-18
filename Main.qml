@@ -1,7 +1,7 @@
-import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
-import QtMultimedia
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtGraphicalEffects 1.15
+import QtMultimedia 5.15
 import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -62,11 +62,10 @@ Item {
         id: backgroundLayer
         anchors.fill: parent
         layer.enabled: true
-        layer.effect: MultiEffect {
-            blurEnabled: true
-            blur: root.blurRadius
-            blurMax: 64
-            blurMultiplier: 0.9
+        layer.effect: GaussianBlur {
+            id: blurEffect
+            radius: root.blurRadius * 64
+            samples: 16
         }
 
         // ── Image statique ou GIF (AnimatedImage supporte les deux) ───────
@@ -225,12 +224,13 @@ Item {
 
         // Ombre portée
         layer.enabled: true
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: Qt.rgba(0, 0, 0, 0.55)
-            shadowBlur: 0.9
-            shadowVerticalOffset: 10
-            shadowHorizontalOffset: 0
+        layer.effect: DropShadow {
+            id: panelShadow
+            transparentBorder: true
+            radius: 12
+            samples: 16
+            verticalOffset: 10
+            color: Qt.rgba(0, 0, 0, 0.55)
         }
 
         // Shake sur erreur d'auth
