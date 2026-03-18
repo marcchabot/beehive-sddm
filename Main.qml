@@ -4,7 +4,7 @@ import QtGraphicalEffects 1.15
 import QtMultimedia 5.15
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.1.4 (Sécurité & Compatibilité)
+// Bee-Hive SDDM — Thème de connexion v0.1.5 (Standardisation Syntaxe)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -149,8 +149,10 @@ Item {
 
     Canvas {
         id: auraGlow
-        width: 600; height: 600
-        x: -180; y: parent.height - 420
+        width: 600
+        height: 600
+        x: -180
+        y: parent.height - 420
         renderStrategy: Canvas.Cooperative
         property real gAlpha: 0.10
         SequentialAnimation on gAlpha {
@@ -214,9 +216,12 @@ Item {
         Column {
             id: loginContent
             anchors {
-                top: parent.top;   topMargin: 36
-                left: parent.left; leftMargin: 36
-                right: parent.right; rightMargin: 36
+                top: parent.top
+                topMargin: 36
+                left: parent.left
+                leftMargin: 36
+                right: parent.right
+                rightMargin: 36
             }
             spacing: 18
 
@@ -237,18 +242,29 @@ Item {
                 Text {
                     text: "Bee-Hive OS"
                     color: root.accent
-                    font { bold: true; pixelSize: 27; family: "monospace" }
+                    font {
+                        bold: true
+                        pixelSize: 27
+                        family: "monospace"
+                    }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {
                     text: (typeof sddm !== "undefined") ? sddm.hostName : "Bee-Hive"
                     color: root.textMuted
-                    font { pixelSize: 12; family: "monospace" }
+                    font {
+                        pixelSize: 12
+                        family: "monospace"
+                    }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
-            Rectangle { width: parent.width; height: 1; color: Qt.rgba(1, 0.72, 0.11, 0.22) }
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Qt.rgba(1, 0.72, 0.11, 0.22)
+            }
 
             Column {
                 width: parent.width
@@ -256,19 +272,32 @@ Item {
                 Text {
                     text: "UTILISATEUR"
                     color: root.accent
-                    font { pixelSize: 10; letterSpacing: 2; family: "monospace" }
+                    font {
+                        pixelSize: 10
+                        letterSpacing: 2
+                        family: "monospace"
+                    }
                 }
                 Rectangle {
-                    width: parent.width; height: 42
+                    width: parent.width
+                    height: 42
                     radius: 9
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: userField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
                     TextInput {
                         id: userField
-                        anchors { fill: parent; leftMargin: 14; rightMargin: 14; topMargin: 12 }
+                        anchors {
+                            fill: parent
+                            leftMargin: 14
+                            rightMargin: 14
+                            topMargin: 12
+                        }
                         color: root.textPrimary
-                        font { pixelSize: 14; family: "monospace" }
+                        font {
+                            pixelSize: 14
+                            family: "monospace"
+                        }
                         text: (typeof userModel !== "undefined" && userModel.lastUser) ? userModel.lastUser : ""
                         verticalAlignment: TextInput.AlignVCenter
                         Keys.onTabPressed: passwordField.forceActiveFocus()
@@ -283,19 +312,32 @@ Item {
                 Text {
                     text: "MOT DE PASSE"
                     color: root.accent
-                    font { pixelSize: 10; letterSpacing: 2; family: "monospace" }
+                    font {
+                        pixelSize: 10
+                        letterSpacing: 2
+                        family: "monospace"
+                    }
                 }
                 Rectangle {
-                    width: parent.width; height: 42
+                    width: parent.width
+                    height: 42
                     radius: 9
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: passwordField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
                     TextInput {
                         id: passwordField
-                        anchors { fill: parent; leftMargin: 14; rightMargin: 14; topMargin: 12 }
+                        anchors {
+                            fill: parent
+                            leftMargin: 14
+                            rightMargin: 14
+                            topMargin: 12
+                        }
                         color: root.textPrimary
-                        font { pixelSize: 14; family: "monospace" }
+                        font {
+                            pixelSize: 14
+                            family: "monospace"
+                        }
                         echoMode: TextInput.Password
                         passwordCharacter: "●"
                         verticalAlignment: TextInput.AlignVCenter
@@ -309,7 +351,10 @@ Item {
                 width: parent.width
                 text: root.loginError
                 color: "#FF5555"
-                font { pixelSize: 12; family: "monospace" }
+                font {
+                    pixelSize: 12
+                    family: "monospace"
+                }
                 visible: root.loginError !== ""
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
@@ -317,14 +362,20 @@ Item {
 
             Rectangle {
                 id: loginButton
-                width: parent.width; height: 46
+                width: parent.width
+                height: 46
                 radius: 11
                 color: loginMouse.pressed ? Qt.darker(root.accent, 1.35) : (loginMouse.containsMouse ? Qt.lighter(root.accent, 1.1) : root.accent)
                 Text {
                     anchors.centerIn: parent
                     text: root.isLogging ? "Connexion en cours…" : "SE CONNECTER"
                     color: "#0D0D0D"
-                    font { bold: true; pixelSize: 13; letterSpacing: 1.6; family: "monospace" }
+                    font {
+                        bold: true
+                        pixelSize: 13
+                        letterSpacing: 1.6
+                        family: "monospace"
+                    }
                 }
                 MouseArea {
                     id: loginMouse
@@ -350,7 +401,10 @@ Item {
                 Text {
                     text: "Session :"
                     color: root.textMuted
-                    font { pixelSize: 11; family: "monospace" }
+                    font {
+                        pixelSize: 11
+                        family: "monospace"
+                    }
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -364,10 +418,13 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: (typeof sessionModel !== "undefined" && sessionModel.rowCount() > 0) 
-                              ? sessionModel.data(sessionModel.index(sessionPickerRow.sessionIdx, 0), 256) // 256 = NameRole
+                              ? sessionModel.data(sessionModel.index(sessionPickerRow.sessionIdx, 0), 256) 
                               : "Défaut"
                         color: root.accent
-                        font { pixelSize: 12; family: "monospace" }
+                        font {
+                            pixelSize: 12
+                            family: "monospace"
+                        }
                     }
 
                     MouseArea {
@@ -395,15 +452,23 @@ Item {
                     delegate: Column {
                         spacing: 5
                         Rectangle {
-                            width: 46; height: 46; radius: 11
+                            width: 46
+                            height: 46
+                            radius: 11
                             color: sysMouse.pressed ? Qt.rgba(1, 0.72, 0.11, 0.28) : (sysMouse.containsMouse ? Qt.rgba(1, 0.72, 0.11, 0.14) : Qt.rgba(0,0,0,0.32))
                             border.color: sysMouse.containsMouse ? root.glassBorder : "transparent"
                             border.width: 1
                             anchors.horizontalCenter: parent.horizontalCenter
-                            Text { anchors.centerIn: parent; text: modelData.icon; font.pixelSize: 18 }
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.icon
+                                font.pixelSize: 18
+                            }
                             MouseArea {
                                 id: sysMouse
-                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     if (typeof sddm !== "undefined") {
                                         if      (modelData.action === "powerOff") sddm.powerOff()
@@ -413,7 +478,15 @@ Item {
                                 }
                             }
                         }
-                        Text { text: modelData.label; color: root.textMuted; font { pixelSize: 9; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter }
+                        Text {
+                            text: modelData.label
+                            color: root.textMuted
+                            font {
+                                pixelSize: 9
+                                family: "monospace"
+                            }
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
                 }
             }
@@ -421,12 +494,38 @@ Item {
     }
 
     Column {
-        anchors { bottom: parent.bottom; bottomMargin: 44; left: parent.left; leftMargin: 52 }
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 44
+            left: parent.left
+            leftMargin: 52
+        }
         spacing: 4
-        Text { id: clockText; color: root.textPrimary; font { pixelSize: 54; bold: true; family: "monospace" }; opacity: 0.92 }
-        Text { id: dateText; color: root.accent; font { pixelSize: 14; family: "monospace"; letterSpacing: 2 }; opacity: 0.85 }
+        Text {
+            id: clockText
+            color: root.textPrimary
+            font {
+                pixelSize: 54
+                bold: true
+                family: "monospace"
+            }
+            opacity: 0.92
+        }
+        Text {
+            id: dateText
+            color: root.accent
+            font {
+                pixelSize: 14
+                family: "monospace"
+                letterSpacing: 2
+            }
+            opacity: 0.85
+        }
         Timer {
-            interval: 1000; running: true; repeat: true; triggeredOnStart: true
+            interval: 1000
+            running: true
+            repeat: true
+            triggeredOnStart: true
             onTriggered: {
                 var now = new Date()
                 clockText.text = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0")
@@ -438,10 +537,18 @@ Item {
     }
 
     Text {
-        anchors { bottom: parent.bottom; bottomMargin: 22; right: parent.right; rightMargin: 30 }
-        text: "Bee-Hive SDDM v0.1.4 🍯"
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 22
+            right: parent.right
+            rightMargin: 30
+        }
+        text: "Bee-Hive SDDM v0.1.5 🍯"
         color: root.textMuted
-        font { pixelSize: 11; family: "monospace" }
+        font {
+            pixelSize: 11
+            family: "monospace"
+        }
         opacity: 0.45
     }
 
