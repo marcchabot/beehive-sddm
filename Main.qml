@@ -478,7 +478,7 @@ Item {
                     model: [
                         { icon: "⏻",  label: "Éteindre",    action: "powerOff" },
                         { icon: "↺",  label: "Redémarrer",  action: "reboot"    },
-                        { icon: "⏾", label: "Veille",      action: "suspend"  }
+                        { icon: "☾", label: "Veille",      action: "suspend"  }
                     ]
                     delegate: Column {
                         spacing: 5
