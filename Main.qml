@@ -291,7 +291,6 @@ Item {
                             fill: parent
                             leftMargin: 14
                             rightMargin: 14
-                            topMargin: 12
                         }
                         color: root.textPrimary
                         font {
