@@ -435,7 +435,10 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.doLogin()
-                   // ── Sélecteur de session (SddmComponents ComboBox natif) ────
+                }
+            }
+
+            // ── Sélecteur de session (SddmComponents ComboBox natif) ────
             Row {
                 id: sessionPickerRow
                 width: parent.width
@@ -455,19 +458,16 @@ Item {
                     height: 28
                     model: sessionModel
                     index: sessionModel.lastIndex
-                    font.pixelSize: 12
-                    font.family: "monospace"
-                    color: root.textPrimary
-                    arrowColor: root.accent
-                    hoverColor: Qt.rgba(1, 0.72, 0.11, 0.15)
-                    focusColor: Qt.rgba(1, 0.72, 0.11, 0.25)
+                    color:       Qt.rgba(0, 0, 0, 0.4)
+                    textColor:   root.textPrimary
                     borderColor: root.glassBorder
-                    menuColor: Qt.rgba(0.07, 0.07, 0.08, 0.97)
+                    hoverColor:  Qt.rgba(1, 0.72, 0.11, 0.20)
+                    focusColor:  Qt.rgba(1, 0.72, 0.11, 0.35)
+                    menuColor:   Qt.rgba(0.07, 0.07, 0.08, 0.97)
+                    arrowColor:  root.accent
                 }
             }
 
-         }
-            }
 
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
