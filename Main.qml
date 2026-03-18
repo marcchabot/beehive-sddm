@@ -1,11 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
-import QtMultimedia 5.15
-import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.1.1 (Compatibilité Polyglotte)
+// Bee-Hive SDDM — Thème de connexion v0.1.3 (Qt5 SDDM — sans ComboBox)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -78,19 +76,7 @@ Item {
             }
         }
 
-        // ── Vidéo (Compatibilité Hybride) ──────────────────────────────────
-        MediaPlayer {
-            id: bgMediaPlayer
-            source: bgType === "video" ? bgSource : ""
-            autoPlay: bgType === "video"
-            loops: MediaPlayer.Infinite
-        }
-        VideoOutput {
-            anchors.fill: parent
-            visible: bgType === "video"
-            source: bgMediaPlayer // Style Qt5 (plus robuste ici)
-            fillMode: VideoOutput.PreserveAspectCrop
-        }
+        // ── Vidéo : non supporté (QtMultimedia optionnel) ─────────────────
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -372,9 +358,18 @@ Item {
                 }
             }
 
+            // ── Sélecteur de session (sans ComboBox pour compatibilité Qt5) ──
             Row {
+                id: sessionPickerRow
                 width: parent.width
-                spacing: 10
+                spacing: 8
+                property int sessionIdx: 0
+                Component.onCompleted: {
+                    sessionPickerRow.sessionIdx =
+                        (typeof sessionModel !== "undefined" &&
+                         sessionModel.lastIndex !== undefined)
+                        ? sessionModel.lastIndex : 0
+                }
 
                 Text {
                     text: "Session :"
@@ -382,12 +377,53 @@ Item {
                     font { pixelSize: 11; family: "monospace" }
                     anchors.verticalCenter: parent.verticalCenter
                 }
-                ComboBox {
-                    id: sessionCombo
-                    width: parent.width - 80
+                Text {
+                    text: "◀"
+                    color: sessionPickerRow.sessionIdx > 0 ? root.accent : root.textMuted
+                    font { pixelSize: 14; family: "monospace" }
+                    anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: if (sessionPickerRow.sessionIdx > 0)
+                                       sessionPickerRow.sessionIdx--
+                    }
+                }
+                ListView {
+                    id: sessionListView
+                    width: parent.width - 120
+                    height: 22
+                    clip: true
+                    interactive: false
                     model: sessionModel
-                    textRole: "name"
-                    currentIndex: sessionModel.lastIndex
+                    currentIndex: sessionPickerRow.sessionIdx
+                    highlightMoveDuration: 120
+                    delegate: Item {
+                        width: sessionListView.width
+                        height: sessionListView.height
+                        Text {
+                            anchors.centerIn: parent
+                            text: name
+                            color: root.textPrimary
+                            font { pixelSize: 12; family: "monospace" }
+                            elide: Text.ElideRight
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                }
+                Text {
+                    text: "▶"
+                    color: (sessionPickerRow.sessionIdx < sessionModel.count - 1)
+                           ? root.accent : root.textMuted
+                    font { pixelSize: 14; family: "monospace" }
+                    anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: if (sessionPickerRow.sessionIdx < sessionModel.count - 1)
+                                       sessionPickerRow.sessionIdx++
+                    }
                 }
             }
 
@@ -488,7 +524,7 @@ Item {
             bottom: parent.bottom; bottomMargin: 22
             right:  parent.right;  rightMargin:  30
         }
-        text: "Bee-Hive SDDM v0.1.1 🍯"
+        text: "Bee-Hive SDDM v0.1.3 🍯"
         color: root.textMuted
         font { pixelSize: 11; family: "monospace" }
         opacity: 0.45
@@ -498,6 +534,6 @@ Item {
         if (root.isLogging) return
         root.loginError = ""
         root.isLogging  = true
-        sddm.login(userField.text, passwordField.text, sessionCombo.currentIndex)
+        sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
     }
 }
