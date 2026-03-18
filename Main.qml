@@ -175,9 +175,13 @@ Item {
 
     Rectangle {
         id: loginPanel
-        width: 420
+        width: 360
         height: loginContent.implicitHeight + 60
-        anchors.centerIn: parent
+        anchors {
+            left: parent.left
+            leftMargin: 80
+            verticalCenter: parent.verticalCenter
+        }
         radius: 22
         color: root.glassBg
         border.width: 1
@@ -291,6 +295,7 @@ Item {
                             fill: parent
                             leftMargin: 14
                             rightMargin: 14
+                            topMargin: 12
                         }
                         color: root.textPrimary
                         font {
@@ -330,7 +335,6 @@ Item {
                             fill: parent
                             leftMargin: 14
                             rightMargin: 14
-                            topMargin: 12
                         }
                         color: root.textPrimary
                         font {
@@ -497,7 +501,7 @@ Item {
             bottom: parent.bottom
             bottomMargin: 44
             left: parent.left
-            leftMargin: 52
+            leftMargin: 80
         }
         spacing: 4
         Text {
