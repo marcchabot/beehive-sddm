@@ -1,9 +1,10 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
+import QtMultimedia 5.15
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.1.3 (Qt5 SDDM — sans ComboBox)
+// Bee-Hive SDDM — Thème de connexion v0.1.4 (Sécurité & Compatibilité)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -76,12 +77,20 @@ Item {
             }
         }
 
-        // ── Vidéo : non supporté (QtMultimedia optionnel) ─────────────────
+        MediaPlayer {
+            id: bgMediaPlayer
+            source: bgType === "video" ? bgSource : ""
+            autoPlay: bgType === "video"
+            loops: MediaPlayer.Infinite
+        }
+        VideoOutput {
+            anchors.fill: parent
+            visible: bgType === "video"
+            source: bgMediaPlayer
+            fillMode: VideoOutput.PreserveAspectCrop
+        }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 2 — Gradient sombre
-    // ══════════════════════════════════════════════════════════════════════
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
@@ -91,17 +100,12 @@ Item {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 3 — Grille hexagonale animée
-    // ══════════════════════════════════════════════════════════════════════
     Canvas {
         id: hexCanvas
         anchors.fill: parent
         opacity: 0.07
         renderStrategy: Canvas.Cooperative
-
         property real phase: 0.0
-
         Timer {
             interval: 125
             running: true
@@ -112,27 +116,22 @@ Item {
                 hexCanvas.requestPaint()
             }
         }
-
         onPaint: {
             var ctx = getContext("2d")
             ctx.clearRect(0, 0, width, height)
-
             var hexR = 38
             var hexW = hexR * 2
             var hexH = Math.sqrt(3) * hexR
             var cols = Math.ceil(width  / (hexW * 0.75)) + 2
             var rows = Math.ceil(height / hexH) + 2
-
             ctx.strokeStyle = "#FFB81C"
             ctx.lineWidth   = 0.7
-
             for (var col = -1; col < cols; col++) {
                 for (var row = -1; row < rows; row++) {
                     var cx = col * hexW * 0.75
                     var cy = row * hexH + (col % 2 === 0 ? 0 : hexH * 0.5)
                     var pulse = 0.25 + 0.75 * Math.abs(Math.sin(phase + col * 0.28 + row * 0.47))
                     ctx.globalAlpha = pulse
-
                     ctx.beginPath()
                     for (var i = 0; i < 6; i++) {
                         var ang = (Math.PI / 3) * i - Math.PI / 6
@@ -148,24 +147,18 @@ Item {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 4 — AuraGlow
-    // ══════════════════════════════════════════════════════════════════════
     Canvas {
         id: auraGlow
         width: 600; height: 600
         x: -180; y: parent.height - 420
         renderStrategy: Canvas.Cooperative
-
         property real gAlpha: 0.10
-
         SequentialAnimation on gAlpha {
             loops: Animation.Infinite
             NumberAnimation { to: 0.18; duration: 3800; easing.type: Easing.InOutSine }
             NumberAnimation { to: 0.05; duration: 3800; easing.type: Easing.InOutSine }
         }
         onGAlphaChanged: requestPaint()
-
         onPaint: {
             var ctx  = getContext("2d")
             ctx.clearRect(0, 0, width, height)
@@ -178,9 +171,6 @@ Item {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 5 — Panneau de connexion (glassmorphique)
-    // ══════════════════════════════════════════════════════════════════════
     Rectangle {
         id: loginPanel
         width: 420
@@ -189,13 +179,11 @@ Item {
         radius: 22
         color: root.glassBg
         border.width: 1
-
         SequentialAnimation on border.color {
             loops: Animation.Infinite
             ColorAnimation { to: Qt.rgba(1, 0.72, 0.11, 0.48); duration: 2800; easing.type: Easing.InOutSine }
             ColorAnimation { to: Qt.rgba(1, 0.72, 0.11, 0.18); duration: 2800; easing.type: Easing.InOutSine }
         }
-
         layer.enabled: true
         layer.effect: DropShadow {
             id: panelShadow
@@ -205,7 +193,6 @@ Item {
             verticalOffset: 10
             color: Qt.rgba(0, 0, 0, 0.55)
         }
-
         transform: Translate { id: shakeTranslate; x: 0 }
         SequentialAnimation {
             id: errorShake
@@ -215,7 +202,6 @@ Item {
             NumberAnimation { target: shakeTranslate; property: "x"; to:   9; duration: 55 }
             NumberAnimation { target: shakeTranslate; property: "x"; to:   0; duration: 55 }
         }
-
         opacity: 0
         scale: 0.93
         Component.onCompleted: appearAnim.start()
@@ -237,7 +223,6 @@ Item {
             Column {
                 width: parent.width
                 spacing: 8
-
                 Text {
                     id: beeLogo
                     text: "🐝"
@@ -256,17 +241,14 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {
-                    text: sddm.hostName
+                    text: (typeof sddm !== "undefined") ? sddm.hostName : "Bee-Hive"
                     color: root.textMuted
                     font { pixelSize: 12; family: "monospace" }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
-            Rectangle {
-                width: parent.width; height: 1
-                color: Qt.rgba(1, 0.72, 0.11, 0.22)
-            }
+            Rectangle { width: parent.width; height: 1; color: Qt.rgba(1, 0.72, 0.11, 0.22) }
 
             Column {
                 width: parent.width
@@ -282,13 +264,12 @@ Item {
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: userField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
-
                     TextInput {
                         id: userField
                         anchors { fill: parent; leftMargin: 14; rightMargin: 14; topMargin: 12 }
                         color: root.textPrimary
                         font { pixelSize: 14; family: "monospace" }
-                        text: userModel.lastUser || ""
+                        text: (typeof userModel !== "undefined" && userModel.lastUser) ? userModel.lastUser : ""
                         verticalAlignment: TextInput.AlignVCenter
                         Keys.onTabPressed: passwordField.forceActiveFocus()
                         Keys.onReturnPressed: root.doLogin()
@@ -310,7 +291,6 @@ Item {
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: passwordField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
-
                     TextInput {
                         id: passwordField
                         anchors { fill: parent; leftMargin: 14; rightMargin: 14; topMargin: 12 }
@@ -339,10 +319,7 @@ Item {
                 id: loginButton
                 width: parent.width; height: 46
                 radius: 11
-                color: loginMouse.pressed        ? Qt.darker(root.accent, 1.35)
-                     : loginMouse.containsMouse  ? Qt.lighter(root.accent, 1.10)
-                     : root.accent
-
+                color: loginMouse.pressed ? Qt.darker(root.accent, 1.35) : (loginMouse.containsMouse ? Qt.lighter(root.accent, 1.1) : root.accent)
                 Text {
                     anchors.centerIn: parent
                     text: root.isLogging ? "Connexion en cours…" : "SE CONNECTER"
@@ -358,17 +335,16 @@ Item {
                 }
             }
 
-            // ── Sélecteur de session (sans ComboBox pour compatibilité Qt5) ──
+            // ── Sélecteur de session (version robuste sans ListView interactive) ──
             Row {
                 id: sessionPickerRow
                 width: parent.width
                 spacing: 8
                 property int sessionIdx: 0
                 Component.onCompleted: {
-                    sessionPickerRow.sessionIdx =
-                        (typeof sessionModel !== "undefined" &&
-                         sessionModel.lastIndex !== undefined)
-                        ? sessionModel.lastIndex : 0
+                    if (typeof sessionModel !== "undefined") {
+                        sessionIdx = sessionModel.lastIndex;
+                    }
                 }
 
                 Text {
@@ -377,52 +353,30 @@ Item {
                     font { pixelSize: 11; family: "monospace" }
                     anchors.verticalCenter: parent.verticalCenter
                 }
-                Text {
-                    text: "◀"
-                    color: sessionPickerRow.sessionIdx > 0 ? root.accent : root.textMuted
-                    font { pixelSize: 14; family: "monospace" }
-                    anchors.verticalCenter: parent.verticalCenter
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: if (sessionPickerRow.sessionIdx > 0)
-                                       sessionPickerRow.sessionIdx--
-                    }
-                }
-                ListView {
-                    id: sessionListView
+
+                Rectangle {
                     width: parent.width - 120
-                    height: 22
-                    clip: true
-                    interactive: false
-                    model: sessionModel
-                    currentIndex: sessionPickerRow.sessionIdx
-                    highlightMoveDuration: 120
-                    delegate: Item {
-                        width: sessionListView.width
-                        height: sessionListView.height
-                        Text {
-                            anchors.centerIn: parent
-                            text: name
-                            color: root.textPrimary
-                            font { pixelSize: 12; family: "monospace" }
-                            elide: Text.ElideRight
-                            width: parent.width
-                            horizontalAlignment: Text.AlignHCenter
-                        }
+                    height: 28
+                    radius: 6
+                    color: Qt.rgba(0,0,0,0.3)
+                    border.color: root.glassBorder
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: (typeof sessionModel !== "undefined" && sessionModel.rowCount() > 0) 
+                              ? sessionModel.data(sessionModel.index(sessionPickerRow.sessionIdx, 0), 256) // 256 = NameRole
+                              : "Défaut"
+                        color: root.accent
+                        font { pixelSize: 12; family: "monospace" }
                     }
-                }
-                Text {
-                    text: "▶"
-                    color: (sessionPickerRow.sessionIdx < sessionModel.count - 1)
-                           ? root.accent : root.textMuted
-                    font { pixelSize: 14; family: "monospace" }
-                    anchors.verticalCenter: parent.verticalCenter
+
                     MouseArea {
                         anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: if (sessionPickerRow.sessionIdx < sessionModel.count - 1)
-                                       sessionPickerRow.sessionIdx++
+                        onClicked: {
+                            if (typeof sessionModel !== "undefined") {
+                                sessionPickerRow.sessionIdx = (sessionPickerRow.sessionIdx + 1) % sessionModel.rowCount()
+                            }
+                        }
                     }
                 }
             }
@@ -432,7 +386,6 @@ Item {
                 spacing: 20
                 topPadding: 4
                 bottomPadding: 6
-
                 Repeater {
                     model: [
                         { icon: "⏻",  label: "Éteindre",    action: "powerOff" },
@@ -442,38 +395,25 @@ Item {
                     delegate: Column {
                         spacing: 5
                         Rectangle {
-                            width: 46; height: 46
-                            radius: 11
-                            color: sysMouse.pressed       ? Qt.rgba(1, 0.72, 0.11, 0.28)
-                                 : sysMouse.containsMouse ? Qt.rgba(1, 0.72, 0.11, 0.14)
-                                 : Qt.rgba(0, 0, 0, 0.32)
+                            width: 46; height: 46; radius: 11
+                            color: sysMouse.pressed ? Qt.rgba(1, 0.72, 0.11, 0.28) : (sysMouse.containsMouse ? Qt.rgba(1, 0.72, 0.11, 0.14) : Qt.rgba(0,0,0,0.32))
                             border.color: sysMouse.containsMouse ? root.glassBorder : "transparent"
                             border.width: 1
                             anchors.horizontalCenter: parent.horizontalCenter
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.icon
-                                font.pixelSize: 18
-                            }
+                            Text { anchors.centerIn: parent; text: modelData.icon; font.pixelSize: 18 }
                             MouseArea {
                                 id: sysMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
+                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    if      (modelData.action === "powerOff") sddm.powerOff()
-                                    else if (modelData.action === "reboot")   sddm.reboot()
-                                    else if (modelData.action === "suspend")  sddm.suspend()
+                                    if (typeof sddm !== "undefined") {
+                                        if      (modelData.action === "powerOff") sddm.powerOff()
+                                        else if (modelData.action === "reboot")   sddm.reboot()
+                                        else if (modelData.action === "suspend")  sddm.suspend()
+                                    }
                                 }
                             }
                         }
-                        Text {
-                            text: modelData.label
-                            color: root.textMuted
-                            font { pixelSize: 9; family: "monospace" }
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                        Text { text: modelData.label; color: root.textMuted; font { pixelSize: 9; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter }
                     }
                 }
             }
@@ -481,50 +421,25 @@ Item {
     }
 
     Column {
-        anchors {
-            bottom: parent.bottom; bottomMargin: 44
-            left: parent.left;     leftMargin:   52
-        }
+        anchors { bottom: parent.bottom; bottomMargin: 44; left: parent.left; leftMargin: 52 }
         spacing: 4
-
-        Text {
-            id: clockText
-            color: root.textPrimary
-            font { pixelSize: 54; bold: true; family: "monospace" }
-            opacity: 0.92
-        }
-        Text {
-            id: dateText
-            color: root.accent
-            font { pixelSize: 14; family: "monospace"; letterSpacing: 2 }
-            opacity: 0.85
-        }
-
+        Text { id: clockText; color: root.textPrimary; font { pixelSize: 54; bold: true; family: "monospace" }; opacity: 0.92 }
+        Text { id: dateText; color: root.accent; font { pixelSize: 14; family: "monospace"; letterSpacing: 2 }; opacity: 0.85 }
         Timer {
-            interval: 1000
-            running: true
-            repeat: true
-            triggeredOnStart: true
+            interval: 1000; running: true; repeat: true; triggeredOnStart: true
             onTriggered: {
                 var now = new Date()
-                var h   = now.getHours().toString().padStart(2, "0")
-                var m   = now.getMinutes().toString().padStart(2, "0")
-                clockText.text = h + ":" + m
-
-                var days   = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"]
+                clockText.text = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0")
+                var days = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"]
                 var months = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"]
-                dateText.text = days[now.getDay()] + " " + now.getDate()
-                              + " " + months[now.getMonth()] + " " + now.getFullYear()
+                dateText.text = days[now.getDay()] + " " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear()
             }
         }
     }
 
     Text {
-        anchors {
-            bottom: parent.bottom; bottomMargin: 22
-            right:  parent.right;  rightMargin:  30
-        }
-        text: "Bee-Hive SDDM v0.1.3 🍯"
+        anchors { bottom: parent.bottom; bottomMargin: 22; right: parent.right; rightMargin: 30 }
+        text: "Bee-Hive SDDM v0.1.4 🍯"
         color: root.textMuted
         font { pixelSize: 11; family: "monospace" }
         opacity: 0.45
@@ -534,6 +449,8 @@ Item {
         if (root.isLogging) return
         root.loginError = ""
         root.isLogging  = true
-        sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
+        if (typeof sddm !== "undefined") {
+            sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
+        }
     }
 }
