@@ -1,14 +1,11 @@
-import QtQuick
-import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
-import QtMultimedia
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtGraphicalEffects 1.15
+import QtMultimedia 5.15
 import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.1
-// Forké de SilentSDDM — Adapté pour Bee-Hive OS (CachyOS)
-// Palette HoneyDark : accent #FFB81C | bg #0D0D0D
-// Fonctionnalités : Image/GIF/Vidéo, grille hex animée, glassmorphisme
+// Bee-Hive SDDM — Thème de connexion v0.1.1 (Compatibilité Polyglotte)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -23,10 +20,7 @@ Item {
     readonly property color glassBg:     Qt.rgba(0.07, 0.07, 0.08, 0.72)
     readonly property color glassBorder: Qt.rgba(1, 0.72, 0.11, 0.28)
 
-    // ── Config depuis theme.conf (avec fallbacks) ─────────────────────────
-    // background_type : "image" | "gif" | "video"
-    // background      : chemin relatif vers le fichier fond
-    // blur_radius      : 0.0 à 1.0
+    // ── Config depuis theme.conf ──────────────────────────────────────────
     property string bgSource:   (typeof config !== "undefined" && config.background)
                                 ? config.background
                                 : "assets/hexa_neon_honey.png"
@@ -43,10 +37,8 @@ Item {
 
     Connections {
         target: sddm
-        function onLoginSucceeded() {
-            root.isLogging = false
-        }
-        function onLoginFailed() {
+        onLoginSucceeded: root.isLogging = false
+        onLoginFailed: {
             root.isLogging = false
             root.loginError = "Identifiants incorrects — réessayez."
             errorShake.start()
@@ -56,7 +48,7 @@ Item {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 1 — Fond d'écran avec couche de rendu isolée
+    // COUCHE 1 — Fond d'écran
     // ══════════════════════════════════════════════════════════════════════
     Item {
         id: backgroundLayer
@@ -68,7 +60,6 @@ Item {
             samples: 16
         }
 
-        // ── Image statique ou GIF (AnimatedImage supporte les deux) ───────
         AnimatedImage {
             id: bgAnimated
             anchors.fill: parent
@@ -79,7 +70,6 @@ Item {
             cache: false
             smooth: true
 
-            // Respiration lente pour images statiques (donne vie sans animation)
             SequentialAnimation on scale {
                 running: bgType === "image"
                 loops: Animation.Infinite
@@ -88,23 +78,23 @@ Item {
             }
         }
 
-        // ── Vidéo ──────────────────────────────────────────────────────────
+        // ── Vidéo (Compatibilité Hybride) ──────────────────────────────────
         MediaPlayer {
             id: bgMediaPlayer
             source: bgType === "video" ? bgSource : ""
-            loops: MediaPlayer.Infinite
             autoPlay: bgType === "video"
+            loops: MediaPlayer.Infinite
         }
         VideoOutput {
             anchors.fill: parent
             visible: bgType === "video"
-            videoSink: bgMediaPlayer.videoSink
+            source: bgMediaPlayer // Style Qt5 (plus robuste ici)
             fillMode: VideoOutput.PreserveAspectCrop
         }
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 2 — Gradient sombre (vignette + profondeur)
+    // COUCHE 2 — Gradient sombre
     // ══════════════════════════════════════════════════════════════════════
     Rectangle {
         anchors.fill: parent
@@ -116,8 +106,7 @@ Item {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 3 — Grille hexagonale animée (overlay décoratif BeeAura)
-    // Tourne à ~8fps pour rester légère sur le GPU de login
+    // COUCHE 3 — Grille hexagonale animée
     // ══════════════════════════════════════════════════════════════════════
     Canvas {
         id: hexCanvas
@@ -128,7 +117,7 @@ Item {
         property real phase: 0.0
 
         Timer {
-            interval: 125   // 8fps — équilibre fluidité / légèreté SDDM
+            interval: 125
             running: true
             repeat: true
             onTriggered: {
@@ -174,7 +163,7 @@ Item {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 4 — AuraGlow (lueur ambrée radiale, coin bas-gauche)
+    // COUCHE 4 — AuraGlow
     // ══════════════════════════════════════════════════════════════════════
     Canvas {
         id: auraGlow
@@ -215,14 +204,12 @@ Item {
         color: root.glassBg
         border.width: 1
 
-        // Halo de bordure animé
         SequentialAnimation on border.color {
             loops: Animation.Infinite
             ColorAnimation { to: Qt.rgba(1, 0.72, 0.11, 0.48); duration: 2800; easing.type: Easing.InOutSine }
             ColorAnimation { to: Qt.rgba(1, 0.72, 0.11, 0.18); duration: 2800; easing.type: Easing.InOutSine }
         }
 
-        // Ombre portée
         layer.enabled: true
         layer.effect: DropShadow {
             id: panelShadow
@@ -233,7 +220,6 @@ Item {
             color: Qt.rgba(0, 0, 0, 0.55)
         }
 
-        // Shake sur erreur d'auth
         transform: Translate { id: shakeTranslate; x: 0 }
         SequentialAnimation {
             id: errorShake
@@ -244,7 +230,6 @@ Item {
             NumberAnimation { target: shakeTranslate; property: "x"; to:   0; duration: 55 }
         }
 
-        // Apparition au démarrage
         opacity: 0
         scale: 0.93
         Component.onCompleted: appearAnim.start()
@@ -254,7 +239,6 @@ Item {
             NumberAnimation { target: loginPanel; property: "scale";   to: 1; duration: 750; easing.type: Easing.OutCubic }
         }
 
-        // ── Contenu ───────────────────────────────────────────────────────
         Column {
             id: loginContent
             anchors {
@@ -264,7 +248,6 @@ Item {
             }
             spacing: 18
 
-            // ── Logo + Titre ───────────────────────────────────────────────
             Column {
                 width: parent.width
                 spacing: 8
@@ -294,13 +277,11 @@ Item {
                 }
             }
 
-            // ── Séparateur ─────────────────────────────────────────────────
             Rectangle {
                 width: parent.width; height: 1
                 color: Qt.rgba(1, 0.72, 0.11, 0.22)
             }
 
-            // ── Champ Utilisateur ──────────────────────────────────────────
             Column {
                 width: parent.width
                 spacing: 6
@@ -315,7 +296,6 @@ Item {
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: userField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
-                    Behavior on border.color { ColorAnimation { duration: 200 } }
 
                     TextInput {
                         id: userField
@@ -330,7 +310,6 @@ Item {
                 }
             }
 
-            // ── Champ Mot de passe ─────────────────────────────────────────
             Column {
                 width: parent.width
                 spacing: 6
@@ -345,7 +324,6 @@ Item {
                     color: Qt.rgba(0, 0, 0, 0.38)
                     border.color: passwordField.activeFocus ? root.accent : root.glassBorder
                     border.width: 1
-                    Behavior on border.color { ColorAnimation { duration: 200 } }
 
                     TextInput {
                         id: passwordField
@@ -361,7 +339,6 @@ Item {
                 }
             }
 
-            // ── Message d'erreur ───────────────────────────────────────────
             Text {
                 width: parent.width
                 text: root.loginError
@@ -372,7 +349,6 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
             }
 
-            // ── Bouton Connexion ───────────────────────────────────────────
             Rectangle {
                 id: loginButton
                 width: parent.width; height: 46
@@ -380,7 +356,6 @@ Item {
                 color: loginMouse.pressed        ? Qt.darker(root.accent, 1.35)
                      : loginMouse.containsMouse  ? Qt.lighter(root.accent, 1.10)
                      : root.accent
-                Behavior on color { ColorAnimation { duration: 140 } }
 
                 Text {
                     anchors.centerIn: parent
@@ -397,7 +372,6 @@ Item {
                 }
             }
 
-            // ── Sélecteur de session ───────────────────────────────────────
             Row {
                 width: parent.width
                 spacing: 10
@@ -428,40 +402,9 @@ Item {
                         font { pixelSize: 11; family: "monospace" }
                         verticalAlignment: Text.AlignVCenter
                     }
-                    popup: Popup {
-                        y: sessionCombo.height + 2
-                        width: sessionCombo.width
-                        padding: 1
-                        background: Rectangle {
-                            radius: 7
-                            color: Qt.rgba(0.07, 0.07, 0.08, 0.96)
-                            border.color: root.glassBorder
-                            border.width: 1
-                        }
-                        contentItem: ListView {
-                            implicitHeight: contentHeight
-                            model: sessionCombo.popup.visible ? sessionCombo.delegateModel : null
-                            clip: true
-                        }
-                    }
-                    delegate: ItemDelegate {
-                        width: sessionCombo.width
-                        background: Rectangle {
-                            color: highlighted ? Qt.rgba(1, 0.72, 0.11, 0.16) : "transparent"
-                        }
-                        contentItem: Text {
-                            leftPadding: 10
-                            text: name
-                            color: highlighted ? root.accent : root.textMuted
-                            font { pixelSize: 11; family: "monospace" }
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        highlighted: sessionCombo.highlightedIndex === index
-                    }
                 }
             }
 
-            // ── Boutons système ────────────────────────────────────────────
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 spacing: 20
@@ -471,7 +414,7 @@ Item {
                 Repeater {
                     model: [
                         { icon: "⏻",  label: "Éteindre",    action: "powerOff" },
-                        { icon: "↺",  label: "Redémarrer",  action: "reboot"   },
+                        { icon: "↺",  label: "Redémarrer",  action: "reboot"    },
                         { icon: "⏸", label: "Veille",      action: "suspend"  }
                     ]
                     delegate: Column {
@@ -485,7 +428,6 @@ Item {
                             border.color: sysMouse.containsMouse ? root.glassBorder : "transparent"
                             border.width: 1
                             anchors.horizontalCenter: parent.horizontalCenter
-                            Behavior on color { ColorAnimation { duration: 140 } }
 
                             Text {
                                 anchors.centerIn: parent
@@ -516,9 +458,6 @@ Item {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 6 — Horloge (bas-gauche)
-    // ══════════════════════════════════════════════════════════════════════
     Column {
         anchors {
             bottom: parent.bottom; bottomMargin: 44
@@ -558,23 +497,17 @@ Item {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 7 — Indicateur version (bas-droit)
-    // ══════════════════════════════════════════════════════════════════════
     Text {
         anchors {
             bottom: parent.bottom; bottomMargin: 22
             right:  parent.right;  rightMargin:  30
         }
-        text: "Bee-Hive SDDM v0.1 🍯"
+        text: "Bee-Hive SDDM v0.1.1 🍯"
         color: root.textMuted
         font { pixelSize: 11; family: "monospace" }
         opacity: 0.45
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // FONCTION — Lancement de la connexion SDDM
-    // ══════════════════════════════════════════════════════════════════════
     function doLogin() {
         if (root.isLogging) return
         root.loginError = ""
