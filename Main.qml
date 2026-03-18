@@ -494,8 +494,8 @@ Item {
                                 anchors.centerIn: parent
                                 text: modelData.icon
                                 color: root.accent
-                                font.pixelSize: 18
-                                font.bold: true
+                                font { pixelSize: 18; bold: true }
+                                style: Text.Normal
                             }
                             MouseArea {
                                 id: sysMouse
