@@ -438,16 +438,12 @@ Item {
             }
 
             // ── Sélecteur de session ────────────────────────────────────
-            // Approche directe : Item avec property int sessionIdx
-            // + ListView visible (1px) pour que les delegates soient instanciés
-            // et exposent model.name via un alias de propriété.
             Item {
                 id: sessionPickerRow
                 width: parent.width
                 height: 28
                 property int sessionIdx: sessionListView.currentIndex
 
-                // Label
                 Text {
                     id: sessionLabel
                     text: "Session :"
@@ -457,9 +453,7 @@ Item {
                     anchors.left: parent.left
                 }
 
-                // Boîte visible
                 Rectangle {
-                    id: sessionBox
                     anchors {
                         left: sessionLabel.right
                         leftMargin: 8
@@ -472,7 +466,6 @@ Item {
                     border.color: root.glassBorder
                     border.width: 1
 
-                    // Texte affiché
                     Text {
                         id: sessionDisplayText
                         anchors {
@@ -482,7 +475,7 @@ Item {
                             rightMargin: 4
                             verticalCenter: parent.verticalCenter
                         }
-                        text: "Chargement..."
+                        text: "—"
                         color: root.textPrimary
                         font { pixelSize: 12; family: "monospace" }
                         elide: Text.ElideRight
@@ -501,37 +494,33 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             var count = sessionListView.count
-                            if (count > 1)
+                            if (count > 1) {
                                 sessionListView.currentIndex = (sessionListView.currentIndex + 1) % count
+                                sessionDisplayText.text = sessionListView.currentItem.sName
+                            }
                         }
                     }
                 }
 
-                // ListView opaque de 1px — SEULEMENT pour instancier les delegates
-                // et pouvoir lire model.name de façon réactive
+                // ListView 1px pour instancier les delegates et lire model.name
                 ListView {
                     id: sessionListView
                     model: sessionModel
                     currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
-                    width: 1
-                    height: 1
-                    opacity: 0
-                    clip: true
+                    width: 1; height: 1; opacity: 0; clip: true
+                    delegate: Item { width: 1; height: 1; property string sName: model.name }
+                }
 
-                    delegate: Item {
-                        width: 1
-                        height: 1
-                        property string sName: model.name
-                    }
-
-                    // Dès que le currentItem est prêt, on met à jour le texte affiché
-                    onCurrentItemChanged: {
-                        if (currentItem && currentItem.sName)
-                            sessionDisplayText.text = currentItem.sName
-                    }
-                    Component.onCompleted: {
-                        if (currentItem && currentItem.sName)
-                            sessionDisplayText.text = currentItem.sName
+                // Timer : attend que la ListView instancie ses delegates
+                Timer {
+                    interval: 100
+                    running: true
+                    repeat: false
+                    onTriggered: {
+                        if (sessionListView.currentItem)
+                            sessionDisplayText.text = sessionListView.currentItem.sName
+                        else
+                            sessionDisplayText.text = sessionModel.rowCount() > 0 ? "Hyprland" : "—"
                     }
                 }
             }
