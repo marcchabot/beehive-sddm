@@ -438,26 +438,21 @@ Item {
             }
 
             // ── Sélecteur de session ─────────────────────────────────────────────
-            // ListView cachée : seule méthode fiable pour accéder à model.name dans SDDM
-            ListView {
-                id: sessionList
-                model: sessionModel
-                visible: false
-                height: 0
-                width: 0
-                currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
-                delegate: Item {
-                    property string sessionName: model.name
-                }
-            }
-
+            // NameRole = Qt.UserRole + 4 = 260 dans SDDM SessionModel
+            // On maintient un index courant et on lit le nom via .data()
             Row {
                 id: sessionPickerRow
                 width: parent.width
                 spacing: 8
 
-                // Index utilisé par doLogin()
-                property int sessionIdx: sessionList.currentIndex
+                property int sessionIdx: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
+
+                function sessionName() {
+                    if (typeof sessionModel === "undefined") return "Hyprland"
+                    var idx = sessionModel.index(sessionIdx, 0)
+                    var name = sessionModel.data(idx, 260) // NameRole = Qt.UserRole+4
+                    return (name && name !== "") ? name : "Hyprland"
+                }
 
                 Text {
                     text: "Session :"
@@ -478,6 +473,7 @@ Item {
                     border.width: 1
 
                     Text {
+                        id: sessionNameText
                         anchors {
                             left: parent.left
                             right: arrowHint.left
@@ -485,7 +481,7 @@ Item {
                             rightMargin: 4
                             verticalCenter: parent.verticalCenter
                         }
-                        text: sessionList.currentItem ? sessionList.currentItem.sessionName : "Hyprland"
+                        text: sessionPickerRow.sessionName()
                         color: root.textPrimary
                         font {
                             pixelSize: 12
@@ -510,9 +506,12 @@ Item {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            var count = (typeof sessionModel !== "undefined") ? sessionModel.rowCount() : 1
-                            if (count > 0)
-                                sessionList.currentIndex = (sessionList.currentIndex + 1) % count
+                            if (typeof sessionModel === "undefined") return
+                            var count = sessionModel.rowCount()
+                            if (count > 0) {
+                                sessionPickerRow.sessionIdx = (sessionPickerRow.sessionIdx + 1) % count
+                                sessionNameText.text = sessionPickerRow.sessionName()
+                            }
                         }
                     }
                 }
