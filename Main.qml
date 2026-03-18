@@ -531,7 +531,7 @@ Item {
                         }
                         Text {
                             text: modelData.label
-                            color: root.textMuted
+                            color: root.textPrimary
                             font {
                                 pixelSize: 9
                                 family: "monospace"
@@ -612,6 +612,10 @@ Item {
         root.isLogging  = true
         if (typeof sddm !== "undefined") {
             sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
+        }
+    }
+}
+   sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
         }
     }
 }
