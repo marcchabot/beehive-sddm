@@ -438,80 +438,87 @@ Item {
             }
 
             // ── Sélecteur de session ─────────────────────────────────────────────
-            // NameRole = Qt.UserRole + 4 = 260 dans SDDM SessionModel
-            // On maintient un index courant et on lit le nom via .data()
+            // ComboBox natif Qt Quick Controls 2 avec textRole "name"
+            // C'est la seule méthode fiable sans import SddmComponents
             Row {
                 id: sessionPickerRow
                 width: parent.width
                 spacing: 8
-
-                property int sessionIdx: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
-
-                function sessionName() {
-                    if (typeof sessionModel === "undefined") return "Hyprland"
-                    var idx = sessionModel.index(sessionIdx, 0)
-                    var name = sessionModel.data(idx, 260) // NameRole = Qt.UserRole+4
-                    return (name && name !== "") ? name : "Hyprland"
-                }
+                property int sessionIdx: sessionCombo.currentIndex
 
                 Text {
                     text: "Session :"
                     color: root.textPrimary
-                    font {
-                        pixelSize: 11
-                        family: "monospace"
-                    }
+                    font { pixelSize: 11; family: "monospace" }
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Rectangle {
+                ComboBox {
+                    id: sessionCombo
                     width: parent.width - 80
                     height: 28
-                    radius: 6
-                    color: Qt.rgba(0, 0, 0, 0.4)
-                    border.color: root.glassBorder
-                    border.width: 1
+                    model: sessionModel
+                    textRole: "name"
+                    currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
 
-                    Text {
-                        id: sessionNameText
-                        anchors {
-                            left: parent.left
-                            right: arrowHint.left
-                            leftMargin: 10
-                            rightMargin: 4
-                            verticalCenter: parent.verticalCenter
-                        }
-                        text: sessionPickerRow.sessionName()
+                    // Style personnalisé Bee-Hive
+                    background: Rectangle {
+                        radius: 6
+                        color: Qt.rgba(0, 0, 0, 0.4)
+                        border.color: root.glassBorder
+                        border.width: 1
+                    }
+
+                    contentItem: Text {
+                        leftPadding: 10
+                        rightPadding: 10
+                        text: sessionCombo.displayText
                         color: root.textPrimary
-                        font {
-                            pixelSize: 12
-                            family: "monospace"
-                        }
+                        font { pixelSize: 12; family: "monospace" }
+                        verticalAlignment: Text.AlignVCenter
                         elide: Text.ElideRight
                     }
 
-                    Text {
-                        id: arrowHint
-                        anchors {
-                            right: parent.right
-                            rightMargin: 8
-                            verticalCenter: parent.verticalCenter
-                        }
-                        text: "▸"
+                    indicator: Text {
+                        x: sessionCombo.width - width - 8
+                        y: (sessionCombo.height - height) / 2
+                        text: "▾"
                         color: root.accent
-                        font.pixelSize: 11
+                        font.pixelSize: 12
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (typeof sessionModel === "undefined") return
-                            var count = sessionModel.rowCount()
-                            if (count > 0) {
-                                sessionPickerRow.sessionIdx = (sessionPickerRow.sessionIdx + 1) % count
-                                sessionNameText.text = sessionPickerRow.sessionName()
-                            }
+                    // Popup stylizé
+                    popup: Popup {
+                        y: sessionCombo.height
+                        width: sessionCombo.width
+                        implicitHeight: Math.min(contentItem.implicitHeight, 200)
+                        padding: 1
+
+                        background: Rectangle {
+                            color: Qt.rgba(0.07, 0.07, 0.08, 0.97)
+                            border.color: root.glassBorder
+                            radius: 6
+                        }
+
+                        contentItem: ListView {
+                            clip: true
+                            implicitHeight: contentHeight
+                            model: sessionCombo.popup.visible ? sessionCombo.delegateModel : null
+                            ScrollIndicator.vertical: ScrollIndicator {}
+                        }
+                    }
+
+                    delegate: ItemDelegate {
+                        width: sessionCombo.width
+                        contentItem: Text {
+                            text: model.name
+                            color: index === sessionCombo.currentIndex ? root.accent : root.textPrimary
+                            font { pixelSize: 12; family: "monospace" }
+                            verticalAlignment: Text.AlignVCenter
+                            leftPadding: 10
+                        }
+                        background: Rectangle {
+                            color: hovered ? Qt.rgba(1, 0.72, 0.11, 0.12) : "transparent"
                         }
                     }
                 }
