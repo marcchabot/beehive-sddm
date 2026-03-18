@@ -437,21 +437,31 @@ Item {
                 }
             }
 
-            // ── Sélecteur de session (version robuste sans ListView interactive) ──
+            // ── Sélecteur de session ─────────────────────────────────────────────
+            // ListView cachée : seule méthode fiable pour accéder à model.name dans SDDM
+            ListView {
+                id: sessionList
+                model: sessionModel
+                visible: false
+                height: 0
+                width: 0
+                currentIndex: (typeof sessionModel !== "undefined") ? sessionModel.lastIndex : 0
+                delegate: Item {
+                    property string sessionName: model.name
+                }
+            }
+
             Row {
                 id: sessionPickerRow
                 width: parent.width
                 spacing: 8
-                property int sessionIdx: 0
-                Component.onCompleted: {
-                    if (typeof sessionModel !== "undefined") {
-                        sessionIdx = sessionModel.lastIndex;
-                    }
-                }
+
+                // Index utilisé par doLogin()
+                property int sessionIdx: sessionList.currentIndex
 
                 Text {
                     text: "Session :"
-                    color: root.textMuted
+                    color: root.textPrimary
                     font {
                         pixelSize: 11
                         family: "monospace"
@@ -460,30 +470,49 @@ Item {
                 }
 
                 Rectangle {
-                    width: parent.width - 120
+                    width: parent.width - 80
                     height: 28
                     radius: 6
-                    color: Qt.rgba(0,0,0,0.3)
+                    color: Qt.rgba(0, 0, 0, 0.4)
                     border.color: root.glassBorder
-                    
+                    border.width: 1
+
                     Text {
-                        anchors.centerIn: parent
-                        text: (typeof sessionModel !== "undefined" && sessionModel.rowCount() > 0) 
-                              ? sessionModel.data(sessionModel.index(sessionPickerRow.sessionIdx, 0), 256) 
-                              : "Défaut"
-                        color: root.accent
+                        anchors {
+                            left: parent.left
+                            right: arrowHint.left
+                            leftMargin: 10
+                            rightMargin: 4
+                            verticalCenter: parent.verticalCenter
+                        }
+                        text: sessionList.currentItem ? sessionList.currentItem.sessionName : "Hyprland"
+                        color: root.textPrimary
                         font {
                             pixelSize: 12
                             family: "monospace"
                         }
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        id: arrowHint
+                        anchors {
+                            right: parent.right
+                            rightMargin: 8
+                            verticalCenter: parent.verticalCenter
+                        }
+                        text: "▸"
+                        color: root.accent
+                        font.pixelSize: 11
                     }
 
                     MouseArea {
                         anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (typeof sessionModel !== "undefined") {
-                                sessionPickerRow.sessionIdx = (sessionPickerRow.sessionIdx + 1) % sessionModel.rowCount()
-                            }
+                            var count = (typeof sessionModel !== "undefined") ? sessionModel.rowCount() : 1
+                            if (count > 0)
+                                sessionList.currentIndex = (sessionList.currentIndex + 1) % count
                         }
                     }
                 }
