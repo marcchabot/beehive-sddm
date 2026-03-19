@@ -1,11 +1,11 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
-import QtMultimedia 5.15
+import QtQuick
+import QtQuick.Controls
+import Qt5Compat.GraphicalEffects
+import QtMultimedia
 import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.1.6 (Compact Layout & Clock Fix)
+// Bee-Hive SDDM — Thème de connexion v0.2.0 (Qt6 Migration)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -37,8 +37,8 @@ Item {
 
     Connections {
         target: sddm
-        onLoginSucceeded: root.isLogging = false
-        onLoginFailed: {
+        function onLoginSucceeded() { root.isLogging = false }
+        function onLoginFailed() {
             root.isLogging = false
             root.loginError = "Identifiants incorrects — réessayez."
             errorShake.start()
@@ -83,11 +83,13 @@ Item {
             source: bgType === "video" ? bgSource : ""
             autoPlay: bgType === "video"
             loops: MediaPlayer.Infinite
+            videoOutput: bgVideoOutput
+            audioOutput: AudioOutput { volume: 0.0 }
         }
         VideoOutput {
+            id: bgVideoOutput
             anchors.fill: parent
             visible: bgType === "video"
-            source: bgMediaPlayer
             fillMode: VideoOutput.PreserveAspectCrop
         }
     }
@@ -108,11 +110,11 @@ Item {
         renderStrategy: Canvas.Cooperative
         property real phase: 0.0
         Timer {
-            interval: 125
+            interval: 180
             running: true
             repeat: true
             onTriggered: {
-                hexCanvas.phase += 0.10
+                hexCanvas.phase += 0.14
                 if (hexCanvas.phase > 6.2832) hexCanvas.phase -= 6.2832
                 hexCanvas.requestPaint()
             }
@@ -579,7 +581,7 @@ Item {
             right: parent.right
             rightMargin: 30
         }
-        text: "Bee-Hive SDDM v0.1.6 🍯"
+        text: "Bee-Hive SDDM v0.2.0 🍯"
         color: root.textMuted
         font {
             pixelSize: 11
