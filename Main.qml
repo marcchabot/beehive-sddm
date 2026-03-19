@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import QtMultimedia
-import SddmComponents 2.0
+import SddmComponents
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Bee-Hive SDDM — Thème de connexion v0.2.0 (Qt6 Migration)
