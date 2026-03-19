@@ -1,11 +1,10 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import Qt5Compat.GraphicalEffects 6.0
-// import QtMultimedia 6.0
+// import QtGraphicalEffects 1.15
 import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.2.0 (Qt6 Migration)
+// Bee-Hive SDDM — Thème de connexion v0.2.1 (Safe Mode)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -53,12 +52,6 @@ Item {
     Item {
         id: backgroundLayer
         anchors.fill: parent
-        layer.enabled: true
-        layer.effect: GaussianBlur {
-            id: blurEffect
-            radius: root.blurRadius * 64
-            samples: 16
-        }
 
         AnimatedImage {
             id: bgAnimated
@@ -77,23 +70,6 @@ Item {
                 NumberAnimation { to: 1.00; duration: 16000; easing.type: Easing.InOutSine }
             }
         }
-
-        /*
-        MediaPlayer {
-            id: bgMediaPlayer
-            source: bgType === "video" ? bgSource : ""
-            autoPlay: bgType === "video"
-            loops: MediaPlayer.Infinite
-            videoOutput: bgVideoOutput
-            audioOutput: AudioOutput { volume: 0.0 }
-        }
-        VideoOutput {
-            id: bgVideoOutput
-            anchors.fill: parent
-            visible: bgType === "video"
-            fillMode: VideoOutput.PreserveAspectCrop
-        }
-        */
     }
 
     Rectangle {
@@ -178,53 +154,6 @@ Item {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // RESEARCH: "Breathing / Wind" effect on a static PNG background
-    // ══════════════════════════════════════════════════════════════════════
-    //
-    // OPTION A — Scale-pulse (already in use, tweak for more life):
-    //   SequentialAnimation on scale {
-    //       NumberAnimation { to: 1.06; duration: 9000; easing.type: Easing.InOutSine }
-    //       NumberAnimation { to: 1.00; duration: 9000; easing.type: Easing.InOutSine }
-    //   }
-    //   Combine with a very slow x/y Translate nudge (±8 px) on a different
-    //   period (13 s) for an organic parallax feel.
-    //
-    // OPTION B — ShaderEffect ripple (QML built-in, no C++):
-    //   Replace the AnimatedImage with a ShaderEffect that samples the image
-    //   as a texture and applies a sine-wave UV distortion:
-    //
-    //   ShaderEffect {
-    //       property variant src: bgTexture    // ShaderEffectSource wrapping the Image
-    //       property real    t:   0.0
-    //       NumberAnimation on t { from: 0; to: 6.2832; duration: 12000; loops: -1 }
-    //       fragmentShader: "
-    //           uniform sampler2D src;
-    //           uniform float     t;
-    //           varying vec2      qt_TexCoord0;
-    //           void main() {
-    //               vec2 uv = qt_TexCoord0;
-    //               uv.x += sin(uv.y * 4.0 + t) * 0.004;  // horizontal ripple
-    //               uv.y += cos(uv.x * 3.5 + t) * 0.003;  // vertical ripple
-    //               gl_FragColor = texture2D(src, uv);
-    //           }
-    //       "
-    //   }
-    //   Amplitude 0.003–0.006 gives a subtle "heat shimmer / silk cloth" look.
-    //   Increase the amplitude and frequency for a stronger wind effect.
-    //
-    // OPTION C — OpacityAnimator on a duplicate blurred layer (zero-cost):
-    //   Stack two copies of the background (one slightly blurred, one sharp).
-    //   Animate the blurred copy's opacity 0.0 ↔ 0.25 over 8 s.
-    //   The slow cross-fade mimics atmospheric depth / bokeh breathing.
-    //
-    // OPTION D — sddm-silent style (video loop):
-    //   Use background_type=video with a seamless MP4 encode of the PNG
-    //   processed through ffmpeg with a subtle zoom/pan filter:
-    //   ffmpeg -loop 1 -i bg.png -vf "zoompan=z='1+0.05*sin(2*PI*t/20)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1920x1080,fps=30" -t 20 bg_wind.mp4
-    //
-    // ══════════════════════════════════════════════════════════════════════
-
     Rectangle {
         id: loginPanel
         width: 310
@@ -242,15 +171,7 @@ Item {
             ColorAnimation { to: Qt.rgba(1, 0.72, 0.11, 0.48); duration: 2800; easing.type: Easing.InOutSine }
             ColorAnimation { to: Qt.rgba(1, 0.72, 0.11, 0.18); duration: 2800; easing.type: Easing.InOutSine }
         }
-        layer.enabled: true
-        layer.effect: DropShadow {
-            id: panelShadow
-            transparentBorder: true
-            radius: 12
-            samples: 16
-            verticalOffset: 10
-            color: Qt.rgba(0, 0, 0, 0.55)
-        }
+        
         transform: Translate { id: shakeTranslate; x: 0 }
         SequentialAnimation {
             id: errorShake
@@ -583,7 +504,7 @@ Item {
             right: parent.right
             rightMargin: 30
         }
-        text: "Bee-Hive SDDM v0.2.0 🍯"
+        text: "Bee-Hive SDDM v0.2.1 🍯"
         color: root.textMuted
         font {
             pixelSize: 11
