@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects 6.0
-import QtMultimedia 6.0
+// import QtMultimedia 6.0
 import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -65,7 +65,7 @@ Item {
             anchors.fill: parent
             source: (bgType === "image" || bgType === "gif") ? bgSource : ""
             fillMode: Image.PreserveAspectCrop
-            visible: bgType !== "video"
+            visible: true
             playing: bgType === "gif"
             cache: false
             smooth: true
@@ -78,6 +78,7 @@ Item {
             }
         }
 
+        /*
         MediaPlayer {
             id: bgMediaPlayer
             source: bgType === "video" ? bgSource : ""
@@ -92,6 +93,7 @@ Item {
             visible: bgType === "video"
             fillMode: VideoOutput.PreserveAspectCrop
         }
+        */
     }
 
     Rectangle {
