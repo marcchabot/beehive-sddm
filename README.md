@@ -8,11 +8,11 @@ A sleek SDDM login theme featuring an animated hexagonal grid, glassmorphism UI 
 
 ## ✨ Key Features
 
-- **Cyber Queen Nexus wallpaper** — background avec l'artwork signature Bee-Hive OS
-- **Animated hexagonal grid** — grille hexagonale animée qui pulse avec la palette HoneyDark
-- **Glassmorphism UI** — panneau de connexion givré avec flou BeeAura configurable
-- **Session picker fonctionnel** — via `SddmComponents 2.0` ComboBox natif (affiche Hyprland, etc.)
-- **Icônes système visibles** — Éteindre ⏻, Redémarrer ↺, Veille ⏸ en jaune miel sur fond sombre
+- **Cyber Queen Nexus wallpaper** — background with signature Bee-Hive OS artwork
+- **Animated hexagonal grid** — animated hex grid pulsing with the HoneyDark palette
+- **Glassmorphism UI** — frosted login panel with configurable BeeAura blur
+- **Functional session picker** — via `SddmComponents 2.0` native ComboBox (displays Hyprland, etc.)
+- **Visible system icons** — Power Off ⏻, Restart ↺, Suspend ⏸ in honey yellow on dark background
 - **Compact left-aligned panel** — formulaire 310px à gauche, horloge bas-droite
 - **Multi-media backgrounds** — PNG statique, GIF animé, vidéo MP4/WebM
 - **Qt5/Qt6 polyglot** — compatible avec les builds SDDM Qt5 et Qt6
@@ -27,12 +27,12 @@ A sleek SDDM login theme featuring an animated hexagonal grid, glassmorphism UI 
 sudo pacman -S qt5-quickcontrols2 qt5-graphicaleffects qt5-multimedia sddm
 ```
 
-| Paquet | Utilité |
+| Package | Purpose |
 |---|---|
 | `qt5-quickcontrols2` | `QtQuick.Controls 2` |
-| `qt5-graphicaleffects` | Effets de flou et de lueur |
-| `qt5-multimedia` | Fond GIF / vidéo |
-| `sddm` | Fournit `SddmComponents 2.0` (ComboBox session) |
+| `qt5-graphicaleffects` | Blur and glow effects |
+| `qt5-multimedia` | GIF / video background |
+| `sddm` | Provides `SddmComponents 2.0` (ComboBox session) |
 
 ---
 
@@ -73,22 +73,22 @@ sudo cp -f ~/beehive-sddm/Main.qml /usr/share/sddm/themes/beehive/Main.qml
 
 ```ini
 [General]
-# Type : "image" | "gif" | "video"
+# Type: "image" | "gif" | "video"
 background_type=image
 background=assets/cyber_queen_nexus.png
-# Flou BeeAura : 0.0 (aucun) → 1.0 (maximum)
+# BeeAura blur: 0.0 (none) → 1.0 (max)
 blur_radius=0.18
 ```
 
-### Fonds disponibles
+### Available backgrounds
 
-| Fichier | Style |
+| File | Style |
 |---|---|
-| `assets/cyber_queen_nexus.png` | **Défaut** — Cyber Queen |
-| `assets/hexa_neon_honey.png` | Hexa-Neon doré miel |
+| `assets/cyber_queen_nexus.png` | **Default** — Cyber Queen |
+| `assets/hexa_neon_honey.png` | Hexa-Neon honey gold |
 | `assets/cyber_bee_monochrome.png` | Cyber-Bee monochrome |
-| `assets/hexa_neon_base.png` | Hexa neutre |
-| `assets/cyber_bee_base.png` | Cyber neutre |
+| `assets/hexa_neon_base.png` | Neutral hex |
+| `assets/cyber_bee_base.png` | Neutral cyber |
 
 ---
 
@@ -114,15 +114,15 @@ beehive_sddm/
 | Version | Notes |
 |---|---|
 | **v0.2.6** | Fix structure QML (ComboBox bien positionné) |
-| **v0.2.5** | `import SddmComponents 2.0` — session picker fonctionnel |
-| **v0.1.8** | Icônes système en jaune miel, labels en blanc |
-| **v0.1.6** | Layout compact, horloge bas-droite, champs centrés |
+| **v0.2.5** | `import SddmComponents 2.0` — functional session picker |
+| **v0.1.8** | System icons in honey yellow, white labels |
+| **v0.1.6** | Compact layout, bottom-right clock, centered fields |
 
 ---
 
 ## 🐝 Crédits
 
-- **Auteurs :** Maya 🐝 & Marc
-- **Licence :** GPL-3.0
+- **Authors:** Maya 🐝 & Marc
+- **License:** GPL-3.0
 
 *Part of the Bee-Hive OS ecosystem. The hive never sleeps.* 🍯

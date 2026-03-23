@@ -30,7 +30,7 @@ Item {
                                 ? parseFloat(config.blur_radius)
                                 : 0.45
 
-    // ── Auth state ─────────────────────────────────────────────────────────
+    // ── État auth ─────────────────────────────────────────────────────────
     property string loginError: ""
     property bool   isLogging:  false
 
@@ -288,7 +288,7 @@ Item {
                 width: parent.width
                 spacing: 6
                 Text {
-                    text: "PASSWORD"
+                    text: "MOT DE PASSE"
                     color: root.accent
                     font {
                         pixelSize: 10
@@ -363,7 +363,7 @@ Item {
                 }
             }
 
-            // ── Session selector (native SddmComponents ComboBox) ────
+            // ── Sélecteur de session (SddmComponents ComboBox natif) ────
             Row {
                 id: sessionPickerRow
                 width: parent.width
@@ -401,9 +401,9 @@ Item {
                 bottomPadding: 6
                 Repeater {
                     model: [
-                        { icon: "⏻",  label: "Power Off",    action: "powerOff" },
-                        { icon: "↺",  label: "Restart",  action: "reboot"    },
-                        { icon: "☾", label: "Sleep",      action: "suspend"  }
+                        { icon: "⏻",  label: "Éteindre",    action: "powerOff" },
+                        { icon: "↺",  label: "Redémarrer",  action: "reboot"    },
+                        { icon: "☾", label: "Veille",      action: "suspend"  }
                     ]
                     delegate: Column {
                         spacing: 5
@@ -490,8 +490,8 @@ Item {
             onTriggered: {
                 var now = new Date()
                 clockText.text = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0")
-                var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-                var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+                var days = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"]
+                var months = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"]
                 dateText.text = days[now.getDay()] + " " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear()
             }
         }
@@ -521,8 +521,4 @@ Item {
             sddm.login(userField.text, passwordField.text, sessionPickerRow.sessionIdx)
         }
     }
-}
-}
-}
-
 }
