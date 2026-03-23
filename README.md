@@ -13,15 +13,15 @@ A sleek SDDM login theme featuring an animated hexagonal grid, glassmorphism UI 
 - **Glassmorphism UI** — frosted login panel with configurable BeeAura blur
 - **Functional session picker** — via `SddmComponents 2.0` native ComboBox (displays Hyprland, etc.)
 - **Visible system icons** — Power Off ⏻, Restart ↺, Suspend ⏸ in honey yellow on dark background
-- **Compact left-aligned panel** — formulaire 310px à gauche, horloge bas-droite
-- **Multi-media backgrounds** — PNG statique, GIF animé, vidéo MP4/WebM
-- **Qt5/Qt6 polyglot** — compatible avec les builds SDDM Qt5 et Qt6
+- **Compact left-aligned panel** — 310px form on the left, bottom-right clock
+- **Multi-media backgrounds** — static PNG, animated GIF, MP4/WebM video
+- **Qt5/Qt6 polyglot** — compatible with both Qt5 and Qt6 SDDM builds
 
 ---
 
-## 📦 Dépendances
+## 📦 Dependencies
 
-> **CRITIQUE pour les utilisateurs Arch / CachyOS** — ces paquets sont requis.
+> **CRITICAL for Arch / CachyOS users** — these packages are required.
 
 ```bash
 sudo pacman -S qt5-quickcontrols2 qt5-graphicaleffects qt5-multimedia sddm
@@ -38,27 +38,27 @@ sudo pacman -S qt5-quickcontrols2 qt5-graphicaleffects qt5-multimedia sddm
 
 ## 🚀 Installation
 
-**1. Cloner le thème :**
+**1. Clone the theme:**
 
 ```bash
 git clone https://github.com/marcchabot/beehive-sddm ~/beehive-sddm
 sudo cp -r ~/beehive-sddm /usr/share/sddm/themes/beehive
 ```
 
-**2. Activer dans `/etc/sddm.conf` :**
+**2. Enable in `/etc/sddm.conf`:**
 
 ```ini
 [Theme]
 Current=beehive
 ```
 
-**3. Tester sans redémarrer :**
+**3. Test without restarting:**
 
 ```bash
 sddm-greeter --test-mode --theme /usr/share/sddm/themes/beehive
 ```
 
-**4. Mettre à jour :**
+**4. Update:**
 
 ```bash
 cd ~/beehive-sddm && git pull
@@ -69,7 +69,7 @@ sudo cp -f ~/beehive-sddm/Main.qml /usr/share/sddm/themes/beehive/Main.qml
 
 ## ⚙️ Configuration
 
-Éditer `theme.conf` :
+Edit `theme.conf`:
 
 ```ini
 [General]
@@ -96,9 +96,9 @@ blur_radius=0.18
 
 ```
 beehive_sddm/
-├── Main.qml            # Script principal du thème
-├── metadata.desktop    # Métadonnées SDDM
-├── theme.conf          # Options configurables
+├── Main.qml            # Main theme script
+├── metadata.desktop    # SDDM metadata
+├── theme.conf          # Configurable options
 └── assets/
     ├── cyber_queen_nexus.png
     ├── hexa_neon_honey.png
@@ -113,7 +113,7 @@ beehive_sddm/
 
 | Version | Notes |
 |---|---|
-| **v0.2.6** | Fix structure QML (ComboBox bien positionné) |
+| **v0.2.6** | Fix QML structure (ComboBox properly positioned) |
 | **v0.2.5** | `import SddmComponents 2.0` — functional session picker |
 | **v0.1.8** | System icons in honey yellow, white labels |
 | **v0.1.6** | Compact layout, bottom-right clock, centered fields |

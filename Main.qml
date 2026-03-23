@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 import SddmComponents 2.0
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Bee-Hive SDDM — Thème de connexion v0.2.1 (Safe Mode)
+// Bee-Hive SDDM — Login Theme v0.2.1 (Safe Mode)
 // ═══════════════════════════════════════════════════════════════════════════
 
 Item {
@@ -19,7 +19,7 @@ Item {
     readonly property color glassBg:     Qt.rgba(0.07, 0.07, 0.08, 0.72)
     readonly property color glassBorder: Qt.rgba(1, 0.72, 0.11, 0.28)
 
-    // ── Config depuis theme.conf ──────────────────────────────────────────
+    // ── Config from theme.conf ──────────────────────────────────────────
     property string bgSource:   (typeof config !== "undefined" && config.background)
                                 ? config.background
                                 : "assets/hexa_neon_honey.png"
@@ -39,7 +39,7 @@ Item {
         function onLoginSucceeded() { root.isLogging = false }
         function onLoginFailed() {
             root.isLogging = false
-            root.loginError = "Identifiants incorrects — réessayez."
+            root.loginError = "Incorrect credentials — try again."
             errorShake.start()
             passwordField.text = ""
             passwordField.forceActiveFocus()
@@ -47,7 +47,7 @@ Item {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // COUCHE 1 — Fond d'écran
+    // LAYER 1 — Background
     // ══════════════════════════════════════════════════════════════════════
     Item {
         id: backgroundLayer
@@ -247,7 +247,7 @@ Item {
                 width: parent.width
                 spacing: 6
                 Text {
-                    text: "UTILISATEUR"
+                    text: "USERNAME"
                     color: root.accent
                     font {
                         pixelSize: 10
@@ -345,7 +345,7 @@ Item {
                 color: loginMouse.pressed ? Qt.darker(root.accent, 1.35) : (loginMouse.containsMouse ? Qt.lighter(root.accent, 1.1) : root.accent)
                 Text {
                     anchors.centerIn: parent
-                    text: root.isLogging ? "Connexion en cours…" : "SE CONNECTER"
+                    text: root.isLogging ? "Signing in…" : "SIGN IN"
                     color: "#0D0D0D"
                     font {
                         bold: true
@@ -371,7 +371,7 @@ Item {
                 property int sessionIdx: sessionComboNative.index
 
                 Text {
-                    text: "Session :"
+                    text: "Session:"
                     color: root.textPrimary
                     font { pixelSize: 11; family: "monospace" }
                     anchors.verticalCenter: parent.verticalCenter
@@ -402,8 +402,8 @@ Item {
                 Repeater {
                     model: [
                         { icon: "⏻",  label: "Power Off",    action: "powerOff" },
-                        { icon: "↺",  label: "Restart",  action: "reboot"    },
-                        { icon: "☾", label: "Sleep",      action: "suspend"  }
+                        { icon: "↺",  label: "Restart",     action: "reboot"    },
+                        { icon: "☾",  label: "Suspend",     action: "suspend"  }
                     ]
                     delegate: Column {
                         spacing: 5
