@@ -17,6 +17,20 @@ A sleek SDDM login theme featuring an animated hexagonal grid, glassmorphism UI 
 - **Multi-media backgrounds** — static PNG, animated GIF, MP4/WebM video
 - **Qt5/Qt6 polyglot** — compatible with both Qt5 and Qt6 SDDM builds
 
+## 🎨 Visual Gallery
+
+Choose your hive atmosphere from our collection of hand-crafted masterpieces:
+
+| **Cyber Queen Nexus** (Default) | **Hexa-Neon Honey** |
+|:---:|:---:|
+| ![Cyber Queen](assets/cyber_queen_nexus.png) | ![Hexa Neon Honey](assets/hexa_neon_honey.png) |
+| *The flagship experience* | *Pure honey energy* |
+
+| **Cyber-Bee Monochrome** | **Hexa-Neon Base** | **Cyber-Bee Base** |
+|:---:|:---:|:---:|
+| ![Cyber Bee Mono](assets/cyber_bee_monochrome.png) | ![Hexa Base](assets/hexa_neon_base.png) | ![Cyber Bee Base](assets/cyber_bee_base.png) |
+| *Sleek & minimal* | *Neutral tech* | *The robotic essence* |
+
 ---
 
 ## 📦 Dependencies
